@@ -1,0 +1,29 @@
+package com.example.focusapp.data
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+
+@Database(entities = [ScheduleBlock::class, BlockedApp::class], version = 1, exportSchema = false)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun scheduleDao(): ScheduleDao
+    abstract fun blockedAppDao(): BlockedAppDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        fun getDatabase(context: Context): AppDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "focus_app_database"
+                ).build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+}

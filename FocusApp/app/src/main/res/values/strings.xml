@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FocusApp</string>
+    <string name="accessibility_service_description">Used to detect when you open a distracting app during a focus session, so we can help you stay on track.</string>
+</resources>

@@ -1,0 +1,11 @@
+FocusApp/.gradle
+FocusApp/app/build
+FocusApp/build
+FocusApp/local.properties
+.gradle
+app/build
+build
+local.properties
+FocusApp/.gradle/
+FocusApp/app/build/
+FocusApp/build/
