@@ -25,7 +25,9 @@ jobs:
 
       - name: Compile Debug APK
         working-directory: ./FocusApp
-        run: gradle assembleDebug
+        run: |
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          gradle assembleDebug -Dorg.gradle.java.home="$JAVA_HOME"
 
       - name: Upload APK for Download
         uses: actions/upload-artifact@v4
