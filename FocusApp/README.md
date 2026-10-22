@@ -39,6 +39,10 @@ FocusApp is an Android application designed to help eliminate distractions by co
    ./gradlew installDebug
    ```
 
+### Finding the APK
+Once you run `./gradlew assembleDebug`, the generated APK will be placed at the following location inside the project:
+`FocusApp/app/build/outputs/apk/debug/app-debug.apk`
+
 ### First-Time Setup on Device
 
 Due to Android security policies regarding app blocking, FocusApp requires explicit user permission to function properly:
