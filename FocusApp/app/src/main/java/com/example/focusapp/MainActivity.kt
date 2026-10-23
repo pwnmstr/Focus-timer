@@ -1,17 +1,17 @@
 package com.example.focusapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.focusapp.data.AppDatabase
 
@@ -24,9 +24,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val db = AppDatabase.getDatabase(this)
+        val prefs = getSharedPreferences("focus_prefs", Context.MODE_PRIVATE)
 
         setContent {
-            MaterialTheme {
+            val systemTheme = isSystemInDarkTheme()
+            var isDarkTheme by remember { mutableStateOf(prefs.getBoolean("dark_mode", systemTheme)) }
+
+            MaterialTheme(
+                colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -58,11 +64,18 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+                    val toggleTheme = {
+                        isDarkTheme = !isDarkTheme
+                        prefs.edit().putBoolean("dark_mode", isDarkTheme).apply()
+                    }
+
                     when (currentScreen) {
                         Screen.SCHEDULE -> {
                             val vm: ScheduleViewModel = viewModel(factory = ScheduleViewModelFactory(db))
                             ScheduleScreen(
                                 viewModel = vm,
+                                isDarkTheme = isDarkTheme,
+                                onToggleTheme = toggleTheme,
                                 onNavigateToAppSelection = { currentScreen = Screen.APPS },
                                 onNavigateToPomodoro = { currentScreen = Screen.POMODORO }
                             )
@@ -71,11 +84,15 @@ class MainActivity : ComponentActivity() {
                             val vm: AppSelectionViewModel = viewModel(factory = AppSelectionViewModelFactory(context, db))
                             AppSelectionScreen(
                                 viewModel = vm,
+                                isDarkTheme = isDarkTheme,
+                                onToggleTheme = toggleTheme,
                                 onBack = { currentScreen = Screen.SCHEDULE }
                             )
                         }
                         Screen.POMODORO -> {
                             PomodoroScreen(
+                                isDarkTheme = isDarkTheme,
+                                onToggleTheme = toggleTheme,
                                 onBack = { currentScreen = Screen.SCHEDULE }
                             )
                         }

@@ -1,0 +1,46 @@
+--- FocusApp/app/src/main/java/com/example/focusapp/ScheduleScreen.kt
++++ FocusApp/app/src/main/java/com/example/focusapp/ScheduleScreen.kt
+@@ -21,11 +21,18 @@
+         topBar = {
+             TopAppBar(
+                 title = { Text("Focus Schedule") },
+                 actions = {
++                    IconButton(onClick = onToggleTheme) {
++                        Text(if (isDarkTheme) "☀️" else "🌙")
++                    }
+                     Button(onClick = onNavigateToPomodoro, modifier = Modifier.padding(end = 8.dp)) {
+                         Text("Timer")
+                     }
+                     Button(onClick = onNavigateToAppSelection) {
+                         Text("Apps")
+                     }
+                 }
+--- FocusApp/app/src/main/java/com/example/focusapp/AppSelectionScreen.kt
++++ FocusApp/app/src/main/java/com/example/focusapp/AppSelectionScreen.kt
+@@ -20,6 +20,11 @@
+                     Button(onClick = onBack, modifier = Modifier.padding(8.dp)) {
+                         Text("Back")
+                     }
++                },
++                actions = {
++                    IconButton(onClick = onToggleTheme) {
++                        Text(if (isDarkTheme) "☀️" else "🌙")
++                    }
+                 }
+             )
+         }
+--- FocusApp/app/src/main/java/com/example/focusapp/PomodoroScreen.kt
++++ FocusApp/app/src/main/java/com/example/focusapp/PomodoroScreen.kt
+@@ -51,6 +51,11 @@
+                         stopTimer()
+                         onBack()
+                     }, modifier = Modifier.padding(8.dp)) {
+                         Text("Back")
+                     }
++                },
++                actions = {
++                    IconButton(onClick = onToggleTheme) {
++                        Text(if (isDarkTheme) "☀️" else "🌙")
++                    }
+                 }
+             )

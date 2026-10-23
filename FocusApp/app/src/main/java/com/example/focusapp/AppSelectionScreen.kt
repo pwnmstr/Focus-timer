@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppSelectionScreen(
+fun AppSelectionScreen(isDarkTheme: Boolean, onToggleTheme: () -> Unit,
     viewModel: AppSelectionViewModel,
     onBack: () -> Unit
 ) {
@@ -24,6 +24,11 @@ fun AppSelectionScreen(
                 navigationIcon = {
                     Button(onClick = onBack, modifier = Modifier.padding(8.dp)) {
                         Text("Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onToggleTheme) {
+                        Text(if (isDarkTheme) "☀️" else "🌙")
                     }
                 }
             )

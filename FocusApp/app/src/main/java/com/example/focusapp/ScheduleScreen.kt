@@ -1,5 +1,6 @@
 package com.example.focusapp
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,12 +11,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.app.TimePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleScreen(
     viewModel: ScheduleViewModel,
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit,
     onNavigateToAppSelection: () -> Unit,
     onNavigateToPomodoro: () -> Unit
 ) {
@@ -27,6 +32,9 @@ fun ScheduleScreen(
             TopAppBar(
                 title = { Text("Focus Schedule") },
                 actions = {
+                    IconButton(onClick = onToggleTheme) {
+                        Text(if (isDarkTheme) "☀️" else "🌙")
+                    }
                     Button(onClick = onNavigateToPomodoro, modifier = Modifier.padding(end = 8.dp)) {
                         Text("Timer")
                     }
@@ -119,65 +127,117 @@ fun AddBlockDialog(
     onDismiss: () -> Unit,
     onSave: (String, Int, Int, Int, Int, Int, Boolean) -> Unit
 ) {
+    val context = LocalContext.current
     var name by remember { mutableStateOf("") }
+
     var selectedDay by remember { mutableStateOf(1) } // 1=Mon .. 7=Sun
+    var expandedDayMenu by remember { mutableStateOf(false) }
+    val days = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
     var startHour by remember { mutableStateOf(9) }
     var startMinute by remember { mutableStateOf(0) }
+
     var endHour by remember { mutableStateOf(10) }
     var endMinute by remember { mutableStateOf(0) }
+
     var isPomodoroEnabled by remember { mutableStateOf(false) }
+
+    val showStartTimePicker = {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                startHour = hourOfDay
+                startMinute = minute
+            },
+            startHour,
+            startMinute,
+            true // 24 hour view
+        ).show()
+    }
+
+    val showEndTimePicker = {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                endHour = hourOfDay
+                endMinute = minute
+            },
+            endHour,
+            endMinute,
+            true // 24 hour view
+        ).show()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Add Focus Block") },
         text = {
-            Column {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Task Name") }
+                    label = { Text("Task Name") },
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Simple day selector
-                Text("Day of week (1=Mon, 7=Sun): $selectedDay")
-                Slider(
-                    value = selectedDay.toFloat(),
-                    onValueChange = { selectedDay = it.toInt() },
-                    valueRange = 1f..7f,
-                    steps = 5
-                )
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Start: ")
-                    // Simplistic time inputs for brevity
+                // Day selector dropdown
+                ExposedDropdownMenuBox(
+                    expanded = expandedDayMenu,
+                    onExpandedChange = { expandedDayMenu = !expandedDayMenu }
+                ) {
                     OutlinedTextField(
-                        value = startHour.toString(),
-                        onValueChange = { startHour = it.toIntOrNull() ?: 0 },
-                        modifier = Modifier.width(60.dp)
+                        readOnly = true,
+                        value = days[selectedDay - 1],
+                        onValueChange = { },
+                        label = { Text("Day of Week") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expandedDayMenu
+                            )
+                        },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
                     )
-                    Text(":")
-                    OutlinedTextField(
-                        value = startMinute.toString(),
-                        onValueChange = { startMinute = it.toIntOrNull() ?: 0 },
-                        modifier = Modifier.width(60.dp)
-                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedDayMenu,
+                        onDismissRequest = { expandedDayMenu = false }
+                    ) {
+                        days.forEachIndexed { index, selectionOption ->
+                            DropdownMenuItem(
+                                text = { Text(text = selectionOption) },
+                                onClick = {
+                                    selectedDay = index + 1
+                                    expandedDayMenu = false
+                                }
+                            )
+                        }
+                    }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top=8.dp)) {
-                    Text("End:   ")
-                    OutlinedTextField(
-                        value = endHour.toString(),
-                        onValueChange = { endHour = it.toIntOrNull() ?: 0 },
-                        modifier = Modifier.width(60.dp)
-                    )
-                    Text(":")
-                    OutlinedTextField(
-                        value = endMinute.toString(),
-                        onValueChange = { endMinute = it.toIntOrNull() ?: 0 },
-                        modifier = Modifier.width(60.dp)
-                    )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Start Time:", style = MaterialTheme.typography.bodyLarge)
+                    TextButton(onClick = showStartTimePicker) {
+                        Text(String.format("%02d:%02d", startHour, startMinute))
+                    }
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("End Time:", style = MaterialTheme.typography.bodyLarge)
+                    TextButton(onClick = showEndTimePicker) {
+                        Text(String.format("%02d:%02d", endHour, endMinute))
+                    }
                 }
 
                 Row(

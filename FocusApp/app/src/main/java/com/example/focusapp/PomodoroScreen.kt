@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PomodoroScreen(onBack: () -> Unit) {
+fun PomodoroScreen(isDarkTheme: Boolean, onToggleTheme: () -> Unit, onBack: () -> Unit) {
     var isRunning by remember { mutableStateOf(false) }
     var isBreak by remember { mutableStateOf(false) }
 
@@ -23,8 +23,6 @@ fun PomodoroScreen(onBack: () -> Unit) {
 
     var timeRemaining by remember { mutableStateOf(workMinutes * 60L) }
     var timer: CountDownTimer? by remember { mutableStateOf(null) }
-
-    val coroutineScope = rememberCoroutineScope()
 
     fun startTimer() {
         isRunning = true
@@ -62,6 +60,11 @@ fun PomodoroScreen(onBack: () -> Unit) {
                         onBack()
                     }, modifier = Modifier.padding(8.dp)) {
                         Text("Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onToggleTheme) {
+                        Text(if (isDarkTheme) "☀️" else "🌙")
                     }
                 }
             )
