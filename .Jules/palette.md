@@ -1,0 +1,3 @@
+## 2024-05-24 - Make AppListItem Entire Row Toggleable
+**Learning:** Applying `Modifier.toggleable` to a parent container (like `Row`) instead of just a child element (like `Switch`) significantly increases the touch target size, improving interaction ease. More importantly, it improves accessibility semantics by ensuring screen readers announce the entire row (including context like the app name) as a single switch control.
+**Action:** Apply `Modifier.toggleable` or similar parent-level interactive modifiers to list items with toggles instead of relying solely on the child component, while ensuring the child component passes `null` to prevent double firing.
