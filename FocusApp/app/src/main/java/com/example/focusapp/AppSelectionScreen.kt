@@ -3,10 +3,12 @@ package com.example.focusapp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +67,11 @@ fun AppListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .toggleable(
+                value = app.isBlocked,
+                onValueChange = onToggle,
+                role = Role.Switch
+            )
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -74,7 +81,7 @@ fun AppListItem(
         }
         Switch(
             checked = app.isBlocked,
-            onCheckedChange = onToggle
+            onCheckedChange = null
         )
     }
 }
