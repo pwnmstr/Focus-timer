@@ -50,31 +50,46 @@ fun ScheduleScreen(
             }
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            val days = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        if (blocks.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No focus blocks scheduled. Tap the + button to add one.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                val days = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
-            for ((index, dayName) in days.withIndex()) {
-                val dayOfWeekNum = index + 1
-                val dayBlocks = blocks.filter { it.dayOfWeek == dayOfWeekNum }
+                for ((index, dayName) in days.withIndex()) {
+                    val dayOfWeekNum = index + 1
+                    val dayBlocks = blocks.filter { it.dayOfWeek == dayOfWeekNum }
 
-                if (dayBlocks.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = dayName,
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 8.dp)
-                        )
-                    }
+                    if (dayBlocks.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = dayName,
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 8.dp)
+                            )
+                        }
 
-                    items(dayBlocks, key = { it.id }) { block ->
-                        BlockItem(
-                            block = block,
-                            onDelete = { viewModel.deleteBlock(block) }
-                        )
+                        items(dayBlocks, key = { it.id }) { block ->
+                            BlockItem(
+                                block = block,
+                                onDelete = { viewModel.deleteBlock(block) }
+                            )
+                        }
                     }
                 }
             }
