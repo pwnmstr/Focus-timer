@@ -94,6 +94,8 @@ fun ScheduleScreen(
 
 @Composable
 fun BlockItem(block: com.example.focusapp.data.ScheduleBlock, onDelete: () -> Unit) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,10 +116,34 @@ fun BlockItem(block: com.example.focusapp.data.ScheduleBlock, onDelete: () -> Un
                     Text(text = "Pomodoro Enabled", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                 }
             }
-            IconButton(onClick = onDelete) {
+            IconButton(onClick = { showDeleteDialog = true }) {
                 Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Block") },
+            text = { Text("Are you sure you want to delete this focus block?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDelete()
+                        showDeleteDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
